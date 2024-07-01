@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const publicAxios = axios.create({
+export const publicAxios = axios.create({
   baseURL: "http://localhost:4000",
 });
 
-const privateAxios = axios.create({
+export const privateAxios = axios.create({
   baseURL: "http://localhost:4000",
 });
 
@@ -29,7 +29,6 @@ privateAxios.interceptors.response.use(
         // Handle the case where there is no refresh token available
         return Promise.reject(new Error("No refresh token found."));
       }
-      
 
       try {
         const newAccessToken = await refreshAccessToken(refreshToken);
@@ -60,4 +59,12 @@ const refreshAccessToken = async (refreshToken) => {
   }
 };
 
-export { publicAxios, privateAxios };
+export const getParkingSpots = async () => await privateAxios.get("/spots");
+export const getParkingSpot = async (id) =>
+  await privateAxios.get(`/spots/${id}`);
+
+export const giveFeedbacks = async ({ id, message }) =>
+  await privateAxios.post(`/spots/${id}/feedbacks`);
+
+export const getFeedbacks = async (id) =>
+  await privateAxios.get(`/spots/${id}/feedbacks`);

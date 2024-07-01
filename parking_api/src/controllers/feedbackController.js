@@ -4,6 +4,8 @@ export const createFeedback = async (req, res) => {
   const user = req.user.userId;
   const spot = req.params.id;
 
+  console.log(user, spot);
+
   try {
     const existingFeedback = await Feedback.findOne({ user, spot });
     if (existingFeedback) {
@@ -28,7 +30,7 @@ export const getFeedbacksBySpot = async (req, res) => {
       "user",
       "_id name"
     );
-    res.status(200).json({ feedbacks });
+    res.status(200).json(feedbacks);
   } catch (error) {
     res.status(500).json({ message: "Error fetching feedbacks for spot" });
   }
