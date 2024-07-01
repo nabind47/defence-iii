@@ -22,13 +22,6 @@ import {
   getFeedbacksByUser,
   updateFeedback,
 } from "../controllers/feedbackController.js";
-import {
-  createRating,
-  deleteRating,
-  getRatingsBySpot,
-  getRatingsByUser,
-  updateRating,
-} from "../controllers/ratingController.js";
 
 const router = express.Router();
 
@@ -46,14 +39,6 @@ router.delete("/:id", authenticate, authorize, deleteParkingSpot);
 router.post("/feeback", handleFeedback);
 
 router.use(authenticate);
-
-// RATINGS
-router.post("/:id/ratings", createRating);
-router.get("/:id/ratings", getRatingsBySpot);
-router.get("/:id/ratings/:userId", getRatingsByUser);
-
-router.put("/:id/ratings/:ratingId", updateRating);
-router.delete("/:id/ratings/:ratingId", deleteRating);
 
 // FEEDBACKS
 router.post("/:id/feedbacks", createFeedback);

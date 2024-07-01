@@ -4,8 +4,6 @@ export const createFeedback = async (req, res) => {
   const user = req.user.userId;
   const spot = req.params.id;
 
-  console.log(user, spot);
-
   try {
     const existingFeedback = await Feedback.findOne({ user, spot });
     if (existingFeedback) {
@@ -14,7 +12,12 @@ export const createFeedback = async (req, res) => {
         .json({ message: "User has already given feedback for this spot" });
     }
 
-    const newFeedback = new Feedback({ message: req.body.message, user, spot });
+    const newFeedback = new Feedback({
+      rating: parseInt(req.body.rating),
+      message: req.body.message,
+      user,
+      spot,
+    });
     await newFeedback.save();
     res.status(201).json({ success: true });
   } catch (error) {
@@ -57,7 +60,7 @@ export const updateFeedback = async (req, res) => {
   try {
     const updatedFeedback = await Feedback.findByIdAndUpdate(
       feedbackId,
-      { message: req.body.message },
+      { rating: parseInt(req.body.rating), message: req.body.message },
       { new: true }
     );
     if (!updatedFeedback) {

@@ -13,12 +13,12 @@ import { TokensContext } from "../hooks/useTokens";
 import Card from "./Card";
 import ParkingMap from "./Map/parkingMap";
 import FeedbackForm from "./modals/feedback";
-import RatingForm from "./modals/rating";
 import mock from "/mock.jpg";
 
 const ParkingPlaceDetails = ({ spot }) => {
-  const { accessToken } = useContext(TokensContext);
   const navigate = useNavigate();
+
+  const { accessToken } = useContext(TokensContext);
 
   return (
     <div className="w-full overflow-hidden space-y-6">
@@ -109,10 +109,7 @@ const ParkingPlaceDetails = ({ spot }) => {
         <>{spot.available && <ReservationModal id={spot._id} />}</>
       )}
 
-      <div className="feedback rating grid sm:grid-cols-[1fr_1fr] gap-8 overflow-hidden">
-        <RatingForm />
-        <FeedbackForm spotId={spot._id} />
-      </div>
+      <FeedbackForm spotId={spot._id} />
     </div>
   );
 };

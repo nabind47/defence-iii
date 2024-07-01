@@ -63,8 +63,8 @@ export const getParkingSpots = async () => await privateAxios.get("/spots");
 export const getParkingSpot = async (id) =>
   await privateAxios.get(`/spots/${id}`);
 
-export const giveFeedbacks = async ({ id, message }) =>
-  await privateAxios.post(`/spots/${id}/feedbacks`);
+export const giveFeedbacks = async ({ spotId, rating, message }) =>
+  await privateAxios.post(`/spots/${spotId}/feedbacks`, { rating, message });
 
-export const getFeedbacks = async (id) =>
-  await privateAxios.get(`/spots/${id}/feedbacks`);
+export const getFeedbacks = async (spotId) =>
+  await privateAxios.get(`/spots/${spotId}/feedbacks`);
