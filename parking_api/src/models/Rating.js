@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 
-const feedbackSchema = new mongoose.Schema(
+const ratingSchema = new mongoose.Schema(
   {
-    message: {
-      type: String,
+    rating: {
+      type: Number,
       required: true,
-      trim: true,
+      min: 1,
+      max: 5,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -21,8 +22,8 @@ const feedbackSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-feedbackSchema.index({ user: 1, spot: 1 }, { unique: true });
+ratingSchema.index({ user: 1, spot: 1 }, { unique: true });
 
-const Feedback = mongoose.model("Feedback", feedbackSchema);
+const Rating = mongoose.model("Rating", ratingSchema);
 
-export default Feedback;
+export default Rating;

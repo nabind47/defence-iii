@@ -8,7 +8,6 @@ const parkingSpotSchema = new mongoose.Schema(
       unique: true,
     },
     description: String,
-    location: String,
     available: {
       type: Boolean,
       default: true,
@@ -19,12 +18,14 @@ const parkingSpotSchema = new mongoose.Schema(
       default: "Open",
     },
     pricePerHour: {
-      type: Number,
-      required: true,
-    },
-    coordinates:{
-      type: String,
-      required: true
+      car: {
+        type: Number,
+        default: 10,
+      },
+      bike: {
+        type: Number,
+        default: 50,
+      },
     },
     capacity: {
       car: {
@@ -36,6 +37,11 @@ const parkingSpotSchema = new mongoose.Schema(
         default: 50,
       },
     },
+
+    coordinates: {
+      type: String,
+      required: true,
+    },
     revenue: {
       type: Number,
       default: 0,
@@ -44,14 +50,30 @@ const parkingSpotSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
-    isFree:Boolean,
+    isFree: { type: Boolean, default: false },
     imageUrls: [String],
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+
+    coordinates: [String],
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      address: {
+        type: String,
+        required: true,
+      },
     },
-    coordinates:[String],
-    
+
     reservations: {
       car: [
         {
@@ -65,6 +87,10 @@ const parkingSpotSchema = new mongoose.Schema(
           ref: "Reservation",
         },
       ],
+    },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }

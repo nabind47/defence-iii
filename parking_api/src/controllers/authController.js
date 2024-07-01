@@ -26,17 +26,20 @@ export const registerUser = async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: "User already exists with this email" });
+      return res
+        .status(409)
+        .json({ message: "User already exists with this email" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword, coordinates });
+    const hash = await bcrypt.hash(password, 10);
+    await User.create({
+      name,
+      email,
+      password: hash,
+      coordinates,
+    });
 
-    // Omit the password field from the response JSON
-    const userWithoutPassword = { ...user._doc };
-    delete userWithoutPassword.password;
-
-    return res.status(201).json({ user: userWithoutPassword });
+    return res.status(201).json({ success: true });
   } catch (error) {
     console.error("Error creating a new user:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -52,7 +55,9 @@ export const loginUser = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "No user exists with this email" });
+      return res
+        .status(404)
+        .json({ message: "No user exists with this email" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -78,7 +83,9 @@ export const loginAdmin = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "No user exists with this email" });
+      return res
+        .status(404)
+        .json({ message: "No user exists with this email" });
     }
     if (!user.roles.includes("admin")) {
       return res.status(401).json({ message: "You are not assigned as admin" });
@@ -102,18 +109,23 @@ export const loginAdmin = async (req, res) => {
 export const refresh = (req, res) => {
   const refreshToken = req.body.refreshToken;
 
-  if (!refreshToken) return res.status(401).json({ message: "No refresh token" });
+  if (!refreshToken)
+    return res.status(401).json({ message: "No refresh token" });
 
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
-    if (err) return res.status(403).json({ message: "Forbidden" });
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, decoded) => {
+      if (err) return res.status(403).json({ message: "Forbidden" });
 
-    const foundUser = await User.findById(decoded.userId);
-    if (!foundUser) return res.status(401).json({ message: "Unauthorized" });
+      const foundUser = await User.findById(decoded.userId);
+      if (!foundUser) return res.status(401).json({ message: "Unauthorized" });
 
-    const accessToken = generateAccessToken(foundUser._id, foundUser.roles);
+      const accessToken = generateAccessToken(foundUser._id, foundUser.roles);
 
-    res.json({ accessToken });
-  });
+      res.json({ accessToken });
+    }
+  );
 };
 
 export const profile = async (req, res) => {
@@ -138,6 +150,10 @@ export const profile = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("refreshToken", { httpOnly: true, sameSite: "None", secure: true });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+  });
   res.json({ message: "Cookie cleared" });
 };

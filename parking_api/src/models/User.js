@@ -20,8 +20,8 @@ const userSchema = new mongoose.Schema(
       enum: ["customer", "owner", "admin"],
       default: ["customer"], // Set the default value as an array
     },
-    coordinates:{
-      type: [String]
+    coordinates: {
+      type: [String],
     },
     vehicles: [
       {

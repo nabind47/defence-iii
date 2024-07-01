@@ -1,14 +1,14 @@
-import express from "express";
-import dotenv from "dotenv";
-import morgan from "morgan";
 import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import morgan from "morgan";
 
 import connectToDB from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import spotsRoutes from "./routes/parkingSpotRoutes.js";
-import vehiclesRoutes from "./routes/vehicleRoutes.js";
 import reservationsRoutes from "./routes/reservationsRoute.js";
+import userRoutes from "./routes/userRoutes.js";
+import vehiclesRoutes from "./routes/vehicleRoutes.js";
 
 import parkingRoutes from "./routes/parkingRoute.js";
 import paymentRoutes from "./routes/paymentRoute.js";
@@ -18,7 +18,6 @@ const app = express();
 
 const corsOptions = {
   origin: [process.env.UI_ORIGIN, process.env.ADMIN_ORIGIN],
-  
 };
 
 app.use(cors(corsOptions));
@@ -36,12 +35,8 @@ app.use("/reservations", reservationsRoutes);
 async function startServer() {
   try {
     await connectToDB();
-    const PORT = process.env.PORT;
-    app.use("/",(req,res) => {
-      res.status(200).json({msg:"Hello from parking api server"})
-    })
-    app.listen(PORT, () => {
-      console.log(`Server is running at http://localhost:${PORT}`);
+    app.listen(process.env.PORT, () => {
+      console.log(`http://localhost:${process.env.PORT}`);
     });
   } catch (error) {
     console.error("Error connecting to the database:", error);
@@ -49,8 +44,3 @@ async function startServer() {
 }
 
 startServer();
-
-
-
-
-

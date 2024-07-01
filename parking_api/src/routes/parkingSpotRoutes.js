@@ -1,19 +1,34 @@
 import express from "express";
 
-import authorize from "../middlewares/authorizeMiddleware.js";
 import authenticate from "../middlewares/authMiddleware.js";
+import authorize from "../middlewares/authorizeMiddleware.js";
 
 import {
+  NearestParking,
   createParkingSpot,
   deleteParkingSpot,
   getParkingSpot,
-  NearestParking,
-  getTotalSpots,
   getParkingSpots,
-  updateParkingSpot,
-  updateAvaliability,
+  getTotalSpots,
   handleFeedback,
+  updateAvaliability,
+  updateParkingSpot,
 } from "../controllers/parkingSpotController.js";
+
+import {
+  createFeedback,
+  deleteFeedback,
+  getFeedbacksBySpot,
+  getFeedbacksByUser,
+  updateFeedback,
+} from "../controllers/feedbackController.js";
+import {
+  createRating,
+  deleteRating,
+  getRatingsBySpot,
+  getRatingsByUser,
+  updateRating,
+} from "../controllers/ratingController.js";
 
 const router = express.Router();
 
@@ -30,5 +45,22 @@ router.put("/:id", authenticate, authorize, updateParkingSpot);
 router.delete("/:id", authenticate, authorize, deleteParkingSpot);
 router.post("/feeback", handleFeedback);
 
+router.use(authenticate);
+
+// RATINGS
+router.post("/:id/ratings", createRating);
+router.get("/:id/ratings", getRatingsBySpot);
+router.get("/:id/ratings/:userId", getRatingsByUser);
+
+router.put("/:id/ratings/:ratingId", updateRating);
+router.delete("/:id/ratings/:ratingId", deleteRating);
+
+// FEEDBACKS
+router.post("/:id/feedbacks", createFeedback);
+router.get("/:id/feedbacks", getFeedbacksBySpot);
+router.get("/:id/feedbacks/:userId", getFeedbacksByUser);
+
+router.put("/:id/feedbacks/:feedbackId", updateFeedback);
+router.delete("/:id/feedbacks/:feedbackId", deleteFeedback);
 
 export default router;

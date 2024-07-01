@@ -4,7 +4,6 @@ import Payment from "../models/Payment.js";
 import Reservation from "../models/Reservation.js";
 import User from "../models/User.js";
 
-
 export const enterParking = async (req, res) => {
   const admin = req.user.userId;
   const reservation = req.body.reservation;
@@ -141,8 +140,7 @@ export const getParkingByUser = async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    const parking = await User.findById(userId).populate('reservations').exec()
-    
+    const parking = await User.findById(userId).populate("reservations").exec();
 
     res.status(200).json({ parkings: parking.reservations });
   } catch (error) {
@@ -166,21 +164,21 @@ export const deleteParking = async (req, res) => {
   }
 };
 
-const CustomgetDistance = (userLocation, destination)=>{
-  if(destination){
+const CustomgetDistance = (userLocation, destination) => {
+  if (destination) {
     let [u_lat, u_long] = destination.split(",");
     let [d_lat, d_long] = userLocation;
     u_lat = parseFloat(u_lat) * (Math.PI / 180);
     u_long = parseFloat(u_long) * (Math.PI / 180);
     d_lat = d_lat * (Math.PI / 180);
     d_long = d_long * (Math.PI / 180);
-  
+
     let dlon = d_long - u_long;
     let dlat = d_lat - u_lat;
     let a =
       Math.pow(Math.sin(dlat / 2), 2) +
       Math.cos(u_lat) * Math.cos(d_lat) * Math.pow(Math.sin(dlon / 2), 2);
-  
+
     let c = 2 * Math.asin(Math.sqrt(a));
     // Radius of earth in kilometers
     let r = 6371;
@@ -188,40 +186,45 @@ const CustomgetDistance = (userLocation, destination)=>{
     return (c * r).toFixed(2);
   }
   return 0;
-
-}
+};
 
 export const getknn = async (req, res) => {
   try {
     // Fetch parking spot data from your schema
     const parkingSpots = await ParkingSpot.find({});
     const userCords = req.query.cords;
-    if(userCords){
-
+    if (userCords) {
       // Function to find k-nearest neighbors
       function kNearestNeighbors(k, newData) {
         // Calculate distances from newData to all points in parkingSpots
-        const distances = parkingSpots.map((spot) => spot.coordinates[0] && ({
-          distance: CustomgetDistance(newData.coordinates, spot.coordinates[0]),
-          ...spot._doc,
-        }));
-        
-  
+        const distances = parkingSpots.map(
+          (spot) =>
+            spot.coordinates[0] && {
+              distance: CustomgetDistance(
+                newData.coordinates,
+                spot.coordinates[0]
+              ),
+              ...spot._doc,
+            }
+        );
+
         // Sort distances in ascending order
         distances.sort((a, b) => a.distance - b.distance);
-  
+
         // Get k-nearest neighbors
         const nearestNeighbors = distances.slice(0, k);
-        
+
         return nearestNeighbors;
       }
-  
+
       // Example usage
-      const newData = { coordinates: userCords?.split(","), label: "user location" };
+      const newData = {
+        coordinates: userCords?.split(","),
+        label: "user location",
+      };
       const k = 4;
       const predictedSpots = kNearestNeighbors(k, newData);
-  
-  
+
       res.status(200).json(predictedSpots);
     }
   } catch (error) {
@@ -229,4 +232,3 @@ export const getknn = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
