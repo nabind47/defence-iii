@@ -2,13 +2,14 @@ import mongoose from "mongoose";
 
 import ParkingSpot from "../models/ParkingSpot.js";
 import Reservation from "../models/Reservation.js";
-import Vehicle from "../models/Vehicle.js";
 import User from "../models/User.js";
+import Vehicle from "../models/Vehicle.js";
 
 export const createReservation = async (req, res) => {
   try {
-    let vehicle;
-    const { parkingSpotId, startTime, endTime, arrivalTime } = req.body;
+    const { parkingSpotId, startTime, endTime, arrivalTime, vehicleId } =
+      req.body;
+
     const customerId = req.user.userId;
 
     if (!parkingSpotId || !startTime || !endTime || !arrivalTime) {
@@ -20,18 +21,14 @@ export const createReservation = async (req, res) => {
       return res.status(404).json({ message: "Parking spot not found" });
     }
 
-    const customer = await User.findById(customerId).populate({ path: "vehicles" });
+    const customer = await User.findById(customerId).populate("vehicles");
     if (!customer) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (req.body.vehicleId) {
-      vehicle = await Vehicle.findById(req.body.vehicleId);
-      if (!vehicle) {
-        return res.status(404).json({ message: "Vehicle not found" });
-      }
-    } else {
-      vehicle = customer.vehicles[0];
+    const vehicle = await Vehicle.findById(vehicleId);
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
     }
 
     const vehicleType = vehicle.vehicleType;
@@ -43,21 +40,15 @@ export const createReservation = async (req, res) => {
       return res.status(400).json({ message: "Reservation is full" });
     }
 
-    const pricePerHour = parkingSpot.pricePerHour;
+    const pricePerHour = parkingSpot.pricePerHour[vehicleType];
 
-    // Calculate the total cost based on the hourly rate and duration
-    // There are 60 seconds in a minute, 60 minutes in an hour, and 1000 milliseconds in a second, so this expression converts milliseconds to hours.
-    // const durationInHours = (endTime - startTime) / (60 * 60 * 1000);
+    const sT = new Date(startTime);
+    const eT = new Date(endTime);
 
-    const sT = new Date(startTime); // Convert to Date
-    const eT = new Date(endTime); // Convert to Date
-
-    // Check if the conversion resulted in valid Date objects
     if (isNaN(sT) || isNaN(eT)) {
       return res.status(400).json({ message: "Invalid date format" });
     }
 
-    // Calculate the total cost based on the hourly rate and duration
     const durationInHours = (eT - sT) / (60 * 60 * 1000);
     if (isNaN(durationInHours) || durationInHours < 0) {
       return res.status(400).json({ message: "Invalid time range" });
@@ -90,10 +81,14 @@ export const createReservation = async (req, res) => {
     customer.reservations.push(reservation._id);
     await customer.save();
 
-    res.status(201).json({ message: "Reservation created successfully", reservation });
+    res
+      .status(201)
+      .json({ message: "Reservation created successfully", reservation });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error creating reservation", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating reservation", error: error.message });
   }
 };
 
@@ -113,7 +108,9 @@ export const getReservations = async (req, res) => {
     res.status(200).json({ reservations });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error fetching reservations", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching reservations", error: error.message });
   }
 };
 
@@ -149,7 +146,9 @@ export const getReservation = async (req, res) => {
     res.status(200).json({ data: reservation });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error fetching reservation", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching reservation", error: error.message });
   }
 };
 
@@ -159,7 +158,10 @@ export const getTotalReservations = async (req, res) => {
     res.status(200).json({ total });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error fetching total reservations", error: error.message });
+    res.status(500).json({
+      message: "Error fetching total reservations",
+      error: error.message,
+    });
   }
 };
 
@@ -201,10 +203,14 @@ export const updateReservation = async (req, res) => {
     reservation.totalCost = totalCost;
 
     await reservation.save();
-    res.status(200).json({ message: "Reservation updated successfully", data: reservation });
+    res
+      .status(200)
+      .json({ message: "Reservation updated successfully", data: reservation });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error updating reservation", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating reservation", error: error.message });
   }
 };
 
@@ -224,10 +230,14 @@ export const updateStatus = async (req, res) => {
 
     reservation.status = status;
     await reservation.save();
-    res.status(200).json({ message: "Reservation updated successfully", data: reservation });
+    res
+      .status(200)
+      .json({ message: "Reservation updated successfully", data: reservation });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error updating reservation", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating reservation", error: error.message });
   }
 };
 
@@ -245,7 +255,10 @@ export const deleteReservation = async (req, res) => {
     }
 
     // Update the User model to remove the reference to the reservation
-    await User.updateOne({ _id: deletedReservation.customer }, { $pull: { reservations: id } });
+    await User.updateOne(
+      { _id: deletedReservation.customer },
+      { $pull: { reservations: id } }
+    );
 
     // Update the ParkingSpot model to remove the reference to the reservation in both car and bike arrays
     await ParkingSpot.updateOne(
@@ -258,9 +271,14 @@ export const deleteReservation = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Reservation deleted successfully", data: deletedReservation });
+    res.status(200).json({
+      message: "Reservation deleted successfully",
+      data: deletedReservation,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error deleting reservation", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting reservation", error: error.message });
   }
 };
