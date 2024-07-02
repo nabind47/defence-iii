@@ -1,15 +1,15 @@
-/* eslint-disable react/prop-types */
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
-import Select from "react-select";
-import DatePicker from "react-datepicker";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Fragment, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { privateAxios } from "../../api";
-import Loading from "../Loading";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import { FaHammer } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+
+import { privateAxios } from "../../api";
+import { toLocalISOString } from "../../utils/date";
+import Loading from "../Loading";
 
 const dialogTransitionConfig = {
   enter: "ease-out duration-300",
@@ -84,13 +84,15 @@ const ReservationModal = ({ id }) => {
       toast.success("Reservation Successful");
     },
     onError: (err) => {
-      toast.err("Error while reservation");
+      toast.error("Error while reservation");
       console.log("error while creating vehicle", err);
     },
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // VALIDATIONS
     mutate(formData);
   };
 
@@ -101,6 +103,17 @@ const ReservationModal = ({ id }) => {
       label: vehicle.model,
     }));
   }
+
+  const getMaxDate = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 3);
+    return toLocalISOString(today).slice(0, 16);
+  };
+
+  const getMinDateTime = () => {
+    const now = new Date();
+    return toLocalISOString(now).slice(0, 16);
+  };
 
   if (isLoading || isVehicleLoading) {
     return <Loading />;
@@ -115,15 +128,20 @@ const ReservationModal = ({ id }) => {
 
   if (vehicles.length < 1) {
     return (
-      <div className="flex items-center gap-4 px-4 py-2 bg-yellow-600 cursor-pointer" onClick={() => navigate("/vehicles")} >
+      <div
+        className="flex items-center gap-4 px-4 py-2 bg-yellow-600 cursor-pointer"
+        onClick={() => navigate("/vehicles")}
+      >
         <FaHammer className="h-8 w-8" />
-        <p className="text-xl text-white rounded-sm">Please register a vehicle first</p>
+        <p className="text-xl text-white rounded-sm">
+          Please register a vehicle first
+        </p>
       </div>
     );
   }
 
   return (
-    < >
+    <>
       <button
         type="button"
         onClick={openModal}
@@ -133,60 +151,75 @@ const ReservationModal = ({ id }) => {
         Reserve Parking
       </button>
 
-      <Transition appear show={isOpen} as={Fragment} >
+      <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <Transition.Child as={Fragment} {...overlayTransitionConfig}>
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto backdrop-blur-sm " >
+          <div className="fixed inset-0 overflow-y-auto backdrop-blur-sm ">
             <div className="flex min-h-full items-center justify-center p-4 text-center ">
               <Transition.Child as={Fragment} {...dialogTransitionConfig}>
-                <Dialog.Panel style={{ height: '550px' }} className="w-full  max-w-md transform overflow-hidden rounded-2xl bg-zinc-900 text-white p-6 text-left align-middle shadow-xl transition-all">
-                  <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
+                <Dialog.Panel
+                  style={{ height: "550px" }}
+                  className="w-full max-w-md transform overflow-hidden rounded-2xl bg-zinc-900 text-white p-6 text-left align-middle shadow-xl transition-all"
+                >
+                  <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col space-y-2"
+                  >
                     <label className="block">Select Vehicle:</label>
                     <Select
                       required
                       placeholder="Select which vehicle"
                       options={vehicleOptions}
-                      value={vehicleOptions.find((option) => option.value === formData.vehicleId)}
+                      value={vehicleOptions.find(
+                        (option) => option.value === formData.vehicleId
+                      )}
                       onChange={handleVehicleChange}
                       className="border text-black placeholder:text-white"
                     />
                     <label className="block">Start Time:</label>
-                    <DatePicker
+                    <input
+                      type="datetime-local"
                       required
-                      placeholderText="Select time for reservation"
-                      selected={formData.startTime}
-                      onChange={(date) => handleDateChange(date, "startTime")}
-                      showTimeSelect
-                      dateFormat="yyyy-MM-dd HH:mm"
-                      className="w-full p-2 border bg-transparent rounded-sm"
+                      value={formData.startTime}
+                      onChange={(event) =>
+                        handleDateChange(event.target.value, "startTime")
+                      }
+                      min={getMinDateTime()}
+                      max={getMaxDate()}
+                      className="w-full p-2 text-black border-0 rounded-sm"
                     />
                     <label className="block">End Time:</label>
-                    <DatePicker
+                    <input
                       required
-                      placeholderText="Select time for reservation"
-                      selected={formData.endTime}
-                      onChange={(date) => handleDateChange(date, "endTime")}
-                      showTimeSelect
-                      dateFormat="yyyy-MM-dd HH:mm"
-                      className="w-full p-2 border bg-transparent rounded-sm"
+                      type="datetime-local"
+                      value={formData.endTime}
+                      onChange={(event) =>
+                        handleDateChange(event.target.value, "endTime")
+                      }
+                      min={getMinDateTime()}
+                      max={getMaxDate()}
+                      className="w-full p-2 text-black border-0 rounded-sm"
                     />
                     <label className="block">Arrival Time:</label>
-                    <DatePicker
+                    <input
                       required
-                      placeholderText="Select arrival time"
-                      selected={formData.arrivalTime}
-                      onChange={(date) => handleDateChange(date, "arrivalTime")}
-                      showTimeSelect
-                      dateFormat="yyyy-MM-dd HH:mm"
-                      className="w-full p-2 border bg-transparent rounded-sm"
+                      type="datetime-local"
+                      value={formData.arrivalTime}
+                      onChange={(event) =>
+                        handleDateChange(event.target.value, "arrivalTime")
+                      }
+                      min={getMinDateTime()}
+                      max={getMaxDate()}
+                      className="w-full p-2 text-black border-0 rounded-sm"
                     />
+
                     <button
                       disabled={isLoading}
                       type="submit"
-                      className="px-4 py-2 border border-transparent bg-purple-600  text-sm font-medium  hover:bg-purple-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      className="px-4 py-2 border border-transparent bg-purple-600 text-sm font-medium hover:bg-purple-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     >
                       Submit Reservation
                     </button>

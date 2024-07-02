@@ -2,10 +2,11 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useParams } from "react-router-dom";
 import Select from "react-select";
 
-import { useParams } from "react-router-dom";
 import { privateAxios } from "../api";
+import { toLocalISOString } from "../utils/date";
 import Loading from "./Loading";
 
 const ReservationForm = () => {
@@ -121,7 +122,7 @@ const ReservationForm = () => {
           onChange={(date) => handleDateChange(date, "startTime")}
           showTimeSelect
           dateFormat="yyyy-MM-dd HH:mm"
-          minDate={new Date()}
+          min={toLocalISOString(new Date()).slice(0, 16)}
           className="w-full p-2 border text-black border-gray-300 rounded-md"
         />
       </div>
@@ -131,7 +132,7 @@ const ReservationForm = () => {
           selected={formData.endTime}
           onChange={(date) => handleDateChange(date, "endTime")}
           showTimeSelect
-          maxDate={(new Date(), 5)}
+          min={toLocalISOString(new Date()).slice(0, 16)}
           dateFormat="yyyy-MM-dd HH:mm"
           className="w-full p-2 border text-black border-gray-300 rounded-md"
         />
