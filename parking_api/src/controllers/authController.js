@@ -68,7 +68,14 @@ export const loginUser = async (req, res) => {
     const accessToken = generateAccessToken(user._id, user.roles);
     const refreshToken = generateRefreshToken(user._id);
 
-    return res.status(200).json({ accessToken, refreshToken });
+    return res.status(200).json({
+      accessToken,
+      refreshToken,
+      user: {
+        _id: user._id,
+        name: user.name,
+      },
+    });
   } catch (error) {
     console.error("Error during login:", error);
     return res.status(500).json({ message: "Internal server error" });

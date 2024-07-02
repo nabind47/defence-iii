@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { FaCar, FaCreativeCommonsSampling } from "react-icons/fa";
 import { privateAxios } from "../api";
 import Loading from "../components/Loading";
-import { FaCar, FaCreativeCommonsSampling, FaDollarSign } from "react-icons/fa";
 import ReservationsList from "../components/ReservationList";
-
 
 const Profile = () => {
   const fetchProfile = async () => {
@@ -16,7 +15,12 @@ const Profile = () => {
     }
   };
 
-  const { data: user, isLoading, isError, error } = useQuery(["profile"], fetchProfile);
+  const {
+    data: user,
+    isLoading,
+    isError,
+    error,
+  } = useQuery(["profile"], fetchProfile);
 
   let totalExpenses = 0;
 
@@ -38,8 +42,12 @@ const Profile = () => {
 
   return (
     <div className="w-11/12 mx-auto my-10 space-y-6">
-      <h2 className="text-2xl font-semibold font-serif text-green-700 py-4 px-4 mb-10 w-1/5 border border-purple-600 shadow-md rounded-md justify-center flex ">{user.name}</h2>
-      {user.vehicles.length < 1 && user.reservations.length < 1 && <p className="text-rose-500">Nothing to render!!</p>}
+      <h2 className="text-2xl font-semibold font-serif text-green-700 py-4 px-4 mb-10 w-1/5 border border-purple-600 shadow-md rounded-md justify-center flex ">
+        {user.name}
+      </h2>
+      {user.vehicles.length < 1 && user.reservations.length < 1 && (
+        <p className="text-rose-500">Nothing to render!!</p>
+      )}
       {user.vehicles.length > 0 && (
         <div className="grid sm:grid-cols-[1fr_1fr_1fr] gap-10  ">
           <div
@@ -48,7 +56,9 @@ const Profile = () => {
             <FaCar className="w-10 h-10" />
             <div className="flex flex-col">
               <div className="text-2xl font-semibold">Vehicles Registered</div>
-              <div className="text-xl font-mono text-green-700">{user.vehicles.length}</div>
+              <div className="text-xl font-mono text-green-700">
+                {user.vehicles.length}
+              </div>
             </div>
           </div>
 
@@ -58,7 +68,9 @@ const Profile = () => {
             <FaCreativeCommonsSampling className="w-10 h-10" />
             <div className="flex flex-col">
               <div className="text-2xl font-semibold">Total Reservations</div>
-              <div className="text-xl text-green-700 font-mono">{user.reservations.length}</div>
+              <div className="text-xl text-green-700 font-mono">
+                {user.reservations.length}
+              </div>
             </div>
           </div>
 
@@ -68,10 +80,12 @@ const Profile = () => {
             {/* <FaDollarSign className="w-10 h-10" /> */}
             <div className="flex flex-col">
               <div className="text-2xl font-semibold">Total Expenses</div>
-            <div className="value flex text-2xl font-semibold font-mono ">
-            <h3 className=" text-black ">Rs.</h3>
-              <div className=" text-green-600 ">{totalExpenses.toFixed(2)}</div>
-            </div>
+              <div className="value flex text-2xl font-semibold font-mono ">
+                <h3 className=" text-black ">Rs.</h3>
+                <div className=" text-green-600 ">
+                  {totalExpenses.toFixed(2)}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -83,7 +97,6 @@ const Profile = () => {
       ) : (
         <p className="text-rose-500">No reservations yet</p>
       )}
-
     </div>
   );
 };

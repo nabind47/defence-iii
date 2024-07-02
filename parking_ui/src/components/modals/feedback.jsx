@@ -3,12 +3,14 @@ import { useState } from "react";
 
 import { FaStar } from "react-icons/fa";
 import { getFeedbacks, giveFeedbacks } from "../../api";
+import { userStore } from "../../store/userStore";
 import Loading from "../Loading";
 
 // eslint-disable-next-line react/prop-types
 function FeedbackForm({ spotId }) {
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState(0);
+  const { user } = userStore();
 
   const queryClient = useQueryClient();
 
@@ -36,9 +38,7 @@ function FeedbackForm({ spotId }) {
     mutation.mutate({ spotId, rating, message });
   };
 
-  const feedbackExists = data.data.some(
-    (item) => item.user._id === "66820f085be42e7825a2e95b"
-  );
+  const feedbackExists = data.data.some((item) => item.user._id === user._id);
 
   return (
     <div className="mt-8 shadow-md rounded-md">

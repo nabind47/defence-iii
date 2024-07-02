@@ -7,9 +7,8 @@ import {
 } from "react-icons/fa";
 import ReservationModal from "./modals/ReservationModal";
 
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { TokensContext } from "../hooks/useTokens";
+import { userStore } from "../store/userStore";
 import Card from "./Card";
 import ParkingMap from "./Map/parkingMap";
 import FeedbackForm from "./modals/feedback";
@@ -18,7 +17,7 @@ import mock from "/mock.jpg";
 const ParkingPlaceDetails = ({ spot }) => {
   const navigate = useNavigate();
 
-  const { accessToken } = useContext(TokensContext);
+  const { accessToken } = userStore();
 
   return (
     <div className="w-full overflow-hidden space-y-6">

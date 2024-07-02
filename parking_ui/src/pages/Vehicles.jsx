@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useQuery } from "@tanstack/react-query";
-import { RiMotorbikeFill } from "react-icons/ri";
 import { FaCarSide } from "react-icons/fa";
+import { RiMotorbikeFill } from "react-icons/ri";
 
 import { privateAxios } from "../api";
 import Loading from "../components/Loading";
-import VehicleRegisterModal from "../components/modals/VehicleRegisterModal";
 import DeleteVehicleModal from "../components/modals/DeleteVehicleModal";
+import VehicleRegisterModal from "../components/modals/VehicleRegisterModal";
 
 const Vehicles = () => {
   const fetchVehicle = async () => {
@@ -19,7 +19,12 @@ const Vehicles = () => {
     }
   };
 
-  const { data: vehicles, isLoading, isError, error } = useQuery(["vehicles"], fetchVehicle);
+  const {
+    data: vehicles,
+    isLoading,
+    isError,
+    error,
+  } = useQuery(["vehicles"], fetchVehicle);
 
   if (isLoading) {
     return <Loading />;
@@ -33,7 +38,13 @@ const Vehicles = () => {
     <div className="w-11/12 mx-auto my-6">
       <div className="grid sm:grid-cols-4 gap-10">
         {vehicles.map((v) => (
-          <Vehicle key={v._id} id={v._id} model={v.model} licensePlate={v.licensePlate} vehicleType={v.vehicleType} />
+          <Vehicle
+            key={v._id}
+            id={v._id}
+            model={v.model}
+            licensePlate={v.licensePlate}
+            vehicleType={v.vehicleType}
+          />
         ))}
       </div>
 
@@ -58,7 +69,12 @@ function Vehicle({ model, licensePlate, vehicleType, id }) {
     }
   };
 
-  const { data: reservations, isError, error, isLoading } = useQuery(["reservations"], fetchReservations);
+  const {
+    data: reservations,
+    isError,
+    error,
+    isLoading,
+  } = useQuery(["reservations"], fetchReservations);
 
   if (isLoading) {
     return (
@@ -71,13 +87,16 @@ function Vehicle({ model, licensePlate, vehicleType, id }) {
   }
 
   const vehicleNotInReservations =
-    !reservations || !reservations.some((reservation) => reservation?.vehicle?._id === id);
+    !reservations ||
+    !reservations.some((reservation) => reservation?.vehicle?._id === id);
 
   return (
     <div className="relative p-1 border px-4 overflow-hidden border-purple-400 rounded-md cursor-pointer hover:border-purple-800 transition-all">
       {IconMap[vehicleType]}
       <h2 className="text-xl text-green-600">{model}</h2>
-      <p className="text-base w-14 text-black bg-gray-400  text-center">{licensePlate}</p>
+      <p className="text-base w-14 text-black bg-gray-400  text-center">
+        {licensePlate}
+      </p>
       {vehicleNotInReservations && <DeleteVehicleModal id={id} />}
     </div>
   );

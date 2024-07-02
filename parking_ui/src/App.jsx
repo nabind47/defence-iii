@@ -1,19 +1,18 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 
+import CreateVehicleForm from "./components/CreateVehicleForm";
+import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
+import Profile from "./pages/Profile";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
-import Profile from "./pages/Profile";
-import Vehicles from "./pages/Vehicles";
-import Spots from "./pages/Spots";
 import Spot from "./pages/Spot";
-import Navbar from "./components/Navbar";
-import CreateVehicleForm from "./components/CreateVehicleForm";
+import Spots from "./pages/Spots";
+import Vehicles from "./pages/Vehicles";
 
-import { useContext } from "react";
-import { TokensContext } from "./hooks/useTokens";
-import Parking from "./pages/Parking";
 import NearestParking from "./pages/NearestParking";
+import Parking from "./pages/Parking";
+import { userStore } from "./store/userStore";
 
 function App() {
   return (
@@ -22,7 +21,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/nearest-parking" element = {<NearestParking />} />
+        <Route path="/nearest-parking" element={<NearestParking />} />
         <Route
           path="/profile"
           element={
@@ -64,7 +63,7 @@ function App() {
 
 // eslint-disable-next-line react/prop-types
 function RequireAuth({ children }) {
-  const { accessToken } = useContext(TokensContext);
+  const { accessToken } = userStore();
 
   if (!accessToken) {
     return <Navigate to="/signin" replace />;

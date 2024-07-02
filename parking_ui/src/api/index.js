@@ -9,7 +9,9 @@ export const privateAxios = axios.create({
 });
 
 privateAxios.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem("accessToken");
+  const data = localStorage.getItem("user-store");
+  const accessToken = JSON.parse(data).state.accessToken;
+
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
@@ -22,11 +24,9 @@ privateAxios.interceptors.response.use(
   },
   async (error) => {
     if (error.response && error.response.status === 403) {
-      console.log("request come here");
-      // Handle the 403 error here (e.g., refresh access token)
-      const refreshToken = localStorage.getItem("refreshToken");
+      const data = localStorage.getItem("user-store");
+      const refreshToken = JSON.parse(data).state.refreshToken;
       if (!refreshToken) {
-        // Handle the case where there is no refresh token available
         return Promise.reject(new Error("No refresh token found."));
       }
 
@@ -52,12 +52,22 @@ const refreshAccessToken = async (refreshToken) => {
   try {
     const response = await publicAxios.post("/auth/refresh", { refreshToken });
     const newAccessToken = response.data.accessToken;
-    localStorage.setItem("accessToken", newAccessToken);
+
+    const data = {
+      state: {
+        accessToken: newAccessToken,
+      },
+    };
+
+    localStorage.setItem("user-store", JSON.stringify(data));
     return newAccessToken;
   } catch (error) {
     return Promise.reject(error);
   }
 };
+
+export const login = async (data) =>
+  await publicAxios.post("/auth/login", data);
 
 export const getParkingSpots = async () => await privateAxios.get("/spots");
 export const getParkingSpot = async (id) =>

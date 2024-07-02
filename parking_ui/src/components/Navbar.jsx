@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 
-import { useContext } from "react";
-import { TokensContext } from "../hooks/useTokens";
+import { userStore } from "../store/userStore";
 
 const Navbar = () => {
-  const { accessToken, deleteTokens } = useContext(TokensContext);
+  const { accessToken, removeTokens } = userStore();
   const isLoggedIn = accessToken ? true : false;
 
   return (
@@ -43,7 +42,7 @@ const Navbar = () => {
                   <li className="hover:text-green-700 transition">Profile</li>
                 </Link>
                 <button
-                  onClick={() => deleteTokens()}
+                  onClick={removeTokens}
                   className="bg-purple-500 hover:bg-purple-700 px-4 py-1 text-white rounded-md"
                 >
                   Sign out

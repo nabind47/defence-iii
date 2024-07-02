@@ -1,12 +1,9 @@
-import { useContext, useEffect, useState } from "react";
 import { FaCashRegister } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { TokensContext } from "../hooks/useTokens";
-import { privateAxios } from "../api";
-import ParkingSpotCard from "../components/ParkingSpotCard";
+import { userStore } from "../store/userStore";
 
 const Home = () => {
-  const { accessToken } = useContext(TokensContext);
+  const { accessToken } = userStore();
   // const [spots, setSpots] = useState([])
 
   // const getCoords = ()=>{
@@ -30,8 +27,14 @@ const Home = () => {
         </div>
       )}
       <div className="min-h-[80vh] flex flex-col justify-center items-center ">
-        <div className="text-black text-4xl mb-6   animate-fade-in-up sm:flex">Welcome to
-        <h2 className="text-green-700 bold ml-2 font-semibold font-serif "> "Smart</h2> <h2 className="ml-2 font-semibold font-serif">Parking"</h2></div>
+        <div className="text-black text-4xl mb-6   animate-fade-in-up sm:flex">
+          Welcome to
+          <h2 className="text-green-700 bold ml-2 font-semibold font-serif ">
+            {" "}
+            "Smart
+          </h2>{" "}
+          <h2 className="ml-2 font-semibold font-serif">Parking"</h2>
+        </div>
         <p className="text-green-900 text-lg mb-4 animate-fade-in-up-delay sm:text-md">
           Reserve your parking spot and have a hassle-free experience.
         </p>
